@@ -24,8 +24,10 @@ JAVA_HOME="$ECS_DIR/jre"
 JAVA="$JAVA_HOME/bin/java"
 
 # Update this JNA archive
-"$JAVA" -Djava.ext.dirs=. -Djava.security.policy=jnaclient.policy -Djna.server=http://192.168.230.17:8889 -Djna.appl=ecs-jnaserver -Duser.language=sv -Duser.region=SE -jar jnaclient.jar -v -UNIX_CLIENT
+"$JAVA" -Djava.ext.dirs=. -Djava.security.policy=jnaclient.policy -Djna.server=http://192.168.1.29:8889 -Djna.appl=ecs-jnaserver -Duser.language=sv -Duser.region=SE -jar jnaclient.jar -v -UNIX_CLIENT
 
 # Start local JNA-server
-"$ECS_DIR/ecs-jnaserver/jnaserver.sh"
+if cd "$ECS_DIR/ecs-jnaserver"; then
+	./jnaserver.sh
+fi
 
