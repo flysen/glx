@@ -20,6 +20,7 @@
 #	2011-02-07, Fredrik Lysén @ Gallerix Sverige AB - jboss.cfg file added
 #	2011-12-08	Fredrik Lysen
 #			-Clean up rem lines
+#
 #			-/etc/init.d/postgresql will run without version number
 ################################################################################
 ##Read up variables from jboss.dfg file
