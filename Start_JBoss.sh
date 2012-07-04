@@ -1,5 +1,5 @@
 #!/bin/bash
-################################################################################
+######################################################################################
 # JBoss startup script.
 #
 # Description: Starts JBoss as a background process. These actions are performed:
@@ -10,21 +10,12 @@
 # Script location: /bin/usr/ecs/
 #
 # Last update:
-#	2010-11-01	Ola Ekelund.
+#  2010-11-01, Ola Ekelund.
 #	2010-11-09	Fredrik Lysen @ Gallerix Sverige AB
-#				- Check postgres running
-#				- Redirect nohup
-#				- Check PID assigned (while)
-#	2011-02-04	Ola Ekelund
-#				- Added setting for postgre version 
-#	2011-02-07, Fredrik Lysén @ Gallerix Sverige AB - jboss.cfg file added
-#	2011-12-08	Fredrik Lysen
-#			-Clean up rem lines
-#
-#			-/etc/init.d/postgresql will run without version number
-################################################################################
-##Read up variables from jboss.dfg file
-. /usr/bin/ecs/jboss.cfg
+#				-Check postgres running
+#				-Redirect nohup
+#				-Check PID assigned (while)
+######################################################################################
 
 DIRNAME=`dirname $0`
 PROGNAME=`basename $0`
@@ -33,17 +24,26 @@ ECS_LOG="$ECS_DIR/ecs-jboss/server/default/log"
 PIDFILE="$ECS_DIR/ecs.pid"
 LOG_DIR="/var/log"
 COUNT="0"
+EMAIL_ADD="fredrik.lysen@gallerix.se"
+
+##Set JAVA_HOME
+JAVA_HOME="$ECS_DIR/jre"
+JAVA="$JAVA_HOME/bin/java"
+
+##Set JBOSS_HOME
+JBOSS_DIR="$ECS_DIR/ecs-jboss"
+JBOSS_HOME="$JBOSS_DIR/bin"
 
 ##Check if Postgresql running
-STATUS_POSTGRES=`/etc/init.d/postgresql status|awk '{print $3}'`
+STATUS_POSTGRES=`/etc/init.d/postgresql-8.4 status|awk '{print $3}'`
 
 ##Check if JBoss is running
 PID=`ps -eo pid,comm,command|grep jboss|awk '$2 == "java" {print $1}'`
 
 ##Check Postgres status
 if [ -z "$STATUS_POSTGRES" ]; then
-	tail -50 $LOG_DIR/postgresql/postgresql-${POSTGRE_VERSION}-main.log | mailx -s "$HOSTNAME $PROGNAME - Error in Postgresql" "$MAIL"
-	echo "* Postgres not running. Mail sent to $MAIL"
+	tail -50 $LOG_DIR/postgresql/postgresql-8.4-main.log | mailx -s "$HOSTNAME $PROGNAME - Error in Postgresql" "$EMAIL_ADD"
+	echo "* Postgres not running. Mail sent to $EMAIL_ADD"
 	exit 0
 fi
 
@@ -73,13 +73,13 @@ if [ -z "$PID" ]; then
 		
 		##If PID not assigned whithin 10 sec die
 		if [ "$COUNT" -gt 10 ]; then
-			tail -100 $ECS_LOG/server.log | mailx -s "$HOSTNAME $PROGNAME - Error count over 10" "$MAIL"
-			echo "* Jboss not starting no PID assigned. Mail sent to $MAIL"
+			tail -100 $ECS_LOG/server.log | mailx -s "$HOSTNAME $PROGNAME - Error count over 10" "$EMAIL_ADD"
+			echo "* Jboss not starting no PID assigned. Mail sent to $EMAIL_ADD"
 			exit 0
 		fi
 	done
 else
-	tail -100 $ECS_LOG/server.log | mailx -s "$HOSTNAME $PROGNAME - JBoss is already running (PID $PID)" "$MAIL" 
-	echo "* JBoss is already running (PID=$PID). Mail sent to $MAIL"
+	tail -100 $ECS_LOG/server.log | mailx -s "$HOSTNAME $PROGNAME - JBoss is already running (PID $PID)" "$EMAIL_ADD" 
+	echo "* JBoss is already running (PID=$PID). Mail sent to $EMAIL_ADD"
 	exit 0
 fi
