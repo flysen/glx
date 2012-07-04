@@ -55,7 +55,7 @@ log_me() {
 ################################################################################
 
 pre_check() {
-	##Check if logdirectory exist
+	##Check if logdirectory exis
 	if [ ! -d $LOG_DIR ]; then
 		echo "Creating directory $LOG_DIR as root with EUID=`id -u`"
 		/bin/mkdir $LOG_DIR
